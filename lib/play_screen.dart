@@ -150,14 +150,14 @@ class PlayScreenState extends State<PlayScreen> {
           Expanded(
             child: Container(
               width: double.infinity,
-              height: 125.0,
+              height: 100.0,
               child: new Visualizer(
                 builder: (BuildContext context, List<int> fft) {
                   return new CustomPaint(
                     painter: new VisualizerPainter(
                         fft: fft,
                         color: Colors.blue.withOpacity(0.55),
-                        height: 125.0
+                        height: 100.0
                     ),
 
                   );
@@ -198,7 +198,7 @@ class PlayScreenState extends State<PlayScreen> {
                 )
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 40.0),
+                  padding: const EdgeInsets.only(top: 20.0),
                   child: Column(
                     children: <Widget>[
                       duration == null ? new Container() : new Slider(
@@ -252,6 +252,7 @@ class VisualizerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     _renderWaves(canvas, size);
+
 
   }
 
