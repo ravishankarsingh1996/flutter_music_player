@@ -8,6 +8,7 @@ import 'package:music_player_app/songs_model.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'custom_button.dart';
+import 'extra.dart';
 
 enum PlayerState { stopped, playing, paused }
 
@@ -132,7 +133,14 @@ class PlayScreenState extends State<PlayScreen> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.menu,color: Colors.white,),
-
+              onPressed: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Extra(),
+                  ),
+                );
+              },
             )
           ],
           elevation: 0.0,
@@ -155,14 +163,14 @@ class PlayScreenState extends State<PlayScreen> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                height: 100.0,
+                height: 125.0,
                 child: Visualizer(
                   builder: (BuildContext context, List<int> fft) {
                     return  CustomPaint(
                       painter: VisualizerPainter(
                           fft: fft,
-                          color: Colors.blue.withOpacity(0.55),
-                          height: 100.0
+                          color: Colors.red,
+                          height: 125.0
                       ),
                       child: new Container(),
                     );
