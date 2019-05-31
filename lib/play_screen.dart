@@ -31,6 +31,7 @@ class PlayScreenState extends State<PlayScreen> {
   PlayerState playerState;
   Duration position;
   Duration duration;
+  SongData songData;
 
 
   get isPlaying => playerState == PlayerState.playing;
@@ -41,6 +42,7 @@ class PlayScreenState extends State<PlayScreen> {
   void initState() {
     super.initState();
     initPlayer();
+    songData=widget.songData;
   }
   initPlayer() {
     if(audioPlayer==null){
@@ -116,119 +118,123 @@ class PlayScreenState extends State<PlayScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.red,
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios,color: Colors.white,),
-          onPressed: () {
+    return AudioPlaylist(
+      playlist: songData.allsongs.map((song)=> song.uri).toList(growable: false),
+      playbackState: PlaybackState.paused,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.red,
+          leading: IconButton(icon: Icon(Icons.arrow_back_ios,color: Colors.white,),
+            onPressed: () {
 
-          },
-          color: Colors.grey,),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.menu,color: Colors.white,),
+            },
+            color: Colors.grey,),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.menu,color: Colors.white,),
 
-          )
-        ],
-        elevation: 0.0,
-      ),
-      body: Column(
-        children: <Widget>[
+            )
+          ],
+          elevation: 0.0,
+        ),
+        body: Column(
+          children: <Widget>[
 
-          Expanded(
-            child: Center(
+            Expanded(
+              child: Center(
+                child: Container(
+                  width: 125.0,
+                  height: 125.0,
+                  child: ClipOval(
+                    child: Image.asset('assets/waterfall.jpg',fit: BoxFit.fill),
+
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
               child: Container(
-                width: 125.0,
-                height: 125.0,
-                child: ClipOval(
-                  child: Image.asset('assets/waterfall.jpg',fit: BoxFit.fill),
-
+                width: double.infinity,
+                height: 100.0,
+                child: Visualizer(
+                  builder: (BuildContext context, List<int> fft) {
+                    return  CustomPaint(
+                      painter: VisualizerPainter(
+                          fft: fft,
+                          color: Colors.blue.withOpacity(0.55),
+                          height: 100.0
+                      ),
+                      child: new Container(),
+                    );
+                  },
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: Container(
+
+            Container(
+              padding: EdgeInsets.only(top: 20.0,bottom: 30.0),
+              color: Colors.red.withOpacity(0.55),
               width: double.infinity,
-              height: 100.0,
-              child: Visualizer(
-                builder: (BuildContext context, List<int> fft) {
-                  return  CustomPaint(
-                    painter: VisualizerPainter(
-                        fft: fft,
-                        color: Colors.blue.withOpacity(0.55),
-                        height: 100.0
+              child: Column(
+                children: <Widget>[
+                  RichText(text: TextSpan(
+                      text: '', children: [
+                    TextSpan(
+                        text: 'Song Title\n',
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          height: 1.5,
+                          letterSpacing: 4.0,
+                        )
                     ),
+                    TextSpan(
+                      text: 'Artist Name',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white.withOpacity(0.75),
+                        height: 1.5,
+                        letterSpacing: 3.0,
+                      ),
+                    ),
+                  ]
+                  )
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Column(
+                      children: <Widget>[
+                        duration == null ? new Container() : new Slider(
+                            value: position?.inMilliseconds?.toDouble() ?? 0,
+                            onChanged: (double value) =>
+                                audioPlayer.seek((value / 1000).roundToDouble()),
+                            min: 0.0,
+                            max: duration.inMilliseconds.toDouble()
 
-                  );
-                },
+                        ),
+
+                        Row(
+                          children: <Widget>[
+                            Expanded(child: Container()),
+                            CustomButton(Icons.skip_previous, () => prev(widget.songData)),
+                            Expanded(child: Container()),
+                            CustomButton(isPlaying ? Icons.pause:Icons.play_arrow,isPlaying ? () => pause() : () => play(widget.song)),
+
+                            Expanded(child: Container()),
+                            new CustomButton(Icons.skip_next, () => next(widget.songData)),
+                            Expanded(child: Container()),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
-          ),
-
-          Container(
-            padding: EdgeInsets.only(top: 20.0,bottom: 30.0),
-            color: Colors.red.withOpacity(0.55),
-            width: double.infinity,
-            child: Column(
-              children: <Widget>[
-                RichText(text: TextSpan(
-                    text: '', children: [
-                  TextSpan(
-                      text: 'Song Title\n',
-                      style: TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        height: 1.5,
-                        letterSpacing: 4.0,
-                      )
-                  ),
-                  TextSpan(
-                    text: 'Artist Name',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white.withOpacity(0.75),
-                      height: 1.5,
-                      letterSpacing: 3.0,
-                    ),
-                  ),
-                ]
-                )
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Column(
-                    children: <Widget>[
-                      duration == null ? new Container() : new Slider(
-                          value: position?.inMilliseconds?.toDouble() ?? 0,
-                          onChanged: (double value) =>
-                              audioPlayer.seek((value / 1000).roundToDouble()),
-                          min: 0.0,
-                          max: duration.inMilliseconds.toDouble()
-
-                      ),
-
-                      Row(
-                        children: <Widget>[
-                          Expanded(child: Container()),
-                          CustomButton(Icons.skip_previous, () => prev(widget.songData)),
-                          Expanded(child: Container()),
-                          CustomButton(isPlaying ? Icons.pause:Icons.play_arrow,isPlaying ? () => pause() : () => play(widget.song)),
-
-                          Expanded(child: Container()),
-                          new CustomButton(Icons.skip_next, () => next(widget.songData)),
-                          Expanded(child: Container()),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -251,7 +257,7 @@ class VisualizerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    return _renderWaves(canvas, size);
+     _renderWaves(canvas, size);
   }
   void _renderWaves(Canvas canvas, Size size) {
     final histogramLow = _createHistogram(fft, 15, 2, ((fft.length) / 4).floor());
