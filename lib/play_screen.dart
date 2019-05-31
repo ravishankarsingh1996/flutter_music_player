@@ -151,10 +151,10 @@ class PlayScreenState extends State<PlayScreen> {
             child: Container(
               width: double.infinity,
               height: 100.0,
-              child: new Visualizer(
+              child: Visualizer(
                 builder: (BuildContext context, List<int> fft) {
-                  return new CustomPaint(
-                    painter: new VisualizerPainter(
+                  return  CustomPaint(
+                    painter: VisualizerPainter(
                         fft: fft,
                         color: Colors.blue.withOpacity(0.55),
                         height: 100.0
@@ -251,11 +251,8 @@ class VisualizerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    _renderWaves(canvas, size);
-
-
+    return _renderWaves(canvas, size);
   }
-
   void _renderWaves(Canvas canvas, Size size) {
     final histogramLow = _createHistogram(fft, 15, 2, ((fft.length) / 4).floor());
     final histogramHigh = _createHistogram(fft, 15, (fft.length / 4).ceil(), (fft.length / 2).floor());
