@@ -15,7 +15,8 @@ enum PlayerState { stopped, playing, paused }
 class PlayScreen extends StatefulWidget {
   final Song song;
   final SongData songData;
-  PlayScreen(this.songData,this.song, {Key key, this.title}) : super(key: key);
+
+  PlayScreen(this.songData, this.song, {Key key, this.title}) : super(key: key);
   bool nowPlayTap;
   final String title;
 
@@ -23,7 +24,6 @@ class PlayScreen extends StatefulWidget {
   State<StatefulWidget> createState() {
     return PlayScreenState();
   }
-
 }
 
 class PlayScreenState extends State<PlayScreen> {
@@ -34,20 +34,20 @@ class PlayScreenState extends State<PlayScreen> {
   Duration duration;
   SongData songData;
 
-
   get isPlaying => playerState == PlayerState.playing;
-  get isPaused => playerState == PlayerState.paused;
 
+  get isPaused => playerState == PlayerState.paused;
 
   @override
   void initState() {
     super.initState();
     initPlayer();
-    songData=widget.songData;
+    songData = widget.songData;
   }
+
   initPlayer() {
-    if(audioPlayer==null){
-      audioPlayer=widget.songData.audioPlayer;
+    if (audioPlayer == null) {
+      audioPlayer = widget.songData.audioPlayer;
     }
     setState(() {
       song = widget.song;
@@ -59,12 +59,12 @@ class PlayScreenState extends State<PlayScreen> {
       play(song);
     });
     audioPlayer.setDurationHandler((d) => setState(() {
-      duration = d;
-    }));
+          duration = d;
+        }));
 
     audioPlayer.setPositionHandler((p) => setState(() {
-      position = p;
-    }));
+          position = p;
+        }));
 
     audioPlayer.setCompletionHandler(() {
       onComplete();
@@ -81,6 +81,7 @@ class PlayScreenState extends State<PlayScreen> {
       });
     });
   }
+
   Future stop() async {
     final result = await audioPlayer.stop();
     if (result == 1)
@@ -89,6 +90,7 @@ class PlayScreenState extends State<PlayScreen> {
         position = new Duration();
       });
   }
+
   void play(Song s) async {
     if (s != null) {
       final result = await audioPlayer.play(s.uri, isLocal: true);
@@ -98,6 +100,7 @@ class PlayScreenState extends State<PlayScreen> {
         });
     }
   }
+
   Future pause() async {
     final result = await audioPlayer.pause();
     if (result == 1) setState(() => playerState = PlayerState.paused);
@@ -107,33 +110,43 @@ class PlayScreenState extends State<PlayScreen> {
     stop();
     play(s.prevSong);
   }
+
   Future next(SongData s) async {
     stop();
     setState(() {
       play(s.nextSong);
     });
   }
+
   void onComplete() {
     setState(() => playerState = PlayerState.stopped);
     play(widget.songData.nextSong);
   }
+
   @override
   Widget build(BuildContext context) {
     return AudioPlaylist(
-      playlist: songData.allsongs.map((song)=> song.uri).toList(growable: false),
+      playlist:
+          songData.allsongs.map((song) => song.uri).toList(growable: false),
       playbackState: PlaybackState.paused,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.red,
-          leading: IconButton(icon: Icon(Icons.arrow_back_ios,color: Colors.white,),
-            onPressed: () {
-
-            },
-            color: Colors.grey,),
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            ),
+            onPressed: () {},
+            color: Colors.grey,
+          ),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.menu,color: Colors.white,),
-              onPressed: (){
+              icon: Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -147,15 +160,14 @@ class PlayScreenState extends State<PlayScreen> {
         ),
         body: Column(
           children: <Widget>[
-
             Expanded(
               child: Center(
                 child: Container(
                   width: 125.0,
                   height: 125.0,
                   child: ClipOval(
-                    child: Image.asset('assets/waterfall.jpg',fit: BoxFit.fill),
-
+                    child:
+                        Image.asset('assets/waterfall.jpg', fit: BoxFit.fill),
                   ),
                 ),
               ),
@@ -166,27 +178,23 @@ class PlayScreenState extends State<PlayScreen> {
                 height: 125.0,
                 child: Visualizer(
                   builder: (BuildContext context, List<int> fft) {
-                    return  CustomPaint(
+                    return CustomPaint(
                       painter: VisualizerPainter(
-                          fft: fft,
-                          color: Colors.red,
-                          height: 125.0
-                      ),
+                          fft: fft, color: Colors.red, height: 125.0),
                       child: new Container(),
                     );
                   },
                 ),
               ),
             ),
-
             Container(
-              padding: EdgeInsets.only(top: 20.0,bottom: 30.0),
+              padding: EdgeInsets.only(top: 20.0, bottom: 30.0),
               color: Colors.red.withOpacity(0.55),
               width: double.infinity,
               child: Column(
                 children: <Widget>[
-                  RichText(text: TextSpan(
-                      text: '', children: [
+                  RichText(
+                      text: TextSpan(text: '', children: [
                     TextSpan(
                         text: 'Song Title\n',
                         style: TextStyle(
@@ -195,8 +203,7 @@ class PlayScreenState extends State<PlayScreen> {
                           color: Colors.white,
                           height: 1.5,
                           letterSpacing: 4.0,
-                        )
-                    ),
+                        )),
                     TextSpan(
                       text: 'Artist Name',
                       style: TextStyle(
@@ -207,31 +214,34 @@ class PlayScreenState extends State<PlayScreen> {
                         letterSpacing: 3.0,
                       ),
                     ),
-                  ]
-                  )
-                  ),
+                  ])),
                   Padding(
                     padding: const EdgeInsets.only(top: 20.0),
                     child: Column(
                       children: <Widget>[
-                        duration == null ? new Container() : new Slider(
-                            value: position?.inMilliseconds?.toDouble() ?? 0,
-                            onChanged: (double value) =>
-                                audioPlayer.seek((value / 1000).roundToDouble()),
-                            min: 0.0,
-                            max: duration.inMilliseconds.toDouble()
-
-                        ),
-
+                        duration == null
+                            ? new Container()
+                            : new Slider(
+                                value:
+                                    position?.inMilliseconds?.toDouble() ?? 0,
+                                onChanged: (double value) => audioPlayer
+                                    .seek((value / 1000).roundToDouble()),
+                                min: 0.0,
+                                max: duration.inMilliseconds.toDouble()),
                         Row(
                           children: <Widget>[
                             Expanded(child: Container()),
-                            CustomButton(Icons.skip_previous, () => prev(widget.songData)),
+                            CustomButton(Icons.skip_previous,
+                                () => prev(widget.songData)),
                             Expanded(child: Container()),
-                            CustomButton(isPlaying ? Icons.pause:Icons.play_arrow,isPlaying ? () => pause() : () => play(widget.song)),
-
+                            CustomButton(
+                                isPlaying ? Icons.pause : Icons.play_arrow,
+                                isPlaying
+                                    ? () => pause()
+                                    : () => play(widget.song)),
                             Expanded(child: Container()),
-                            new CustomButton(Icons.skip_next, () => next(widget.songData)),
+                            new CustomButton(
+                                Icons.skip_next, () => next(widget.songData)),
                             Expanded(child: Container()),
                           ],
                         ),
@@ -249,7 +259,6 @@ class PlayScreenState extends State<PlayScreen> {
 }
 
 class VisualizerPainter extends CustomPainter {
-
   final List<int> fft;
   final double height;
   final Color color;
@@ -260,16 +269,19 @@ class VisualizerPainter extends CustomPainter {
     this.height,
     this.color,
   }) : wavePaint = new Paint()
-    ..color = color.withOpacity(0.55)
-    ..style = PaintingStyle.fill;
+          ..color = color.withOpacity(0.55)
+          ..style = PaintingStyle.fill;
 
   @override
   void paint(Canvas canvas, Size size) {
-     _renderWaves(canvas, size);
+    return _renderWaves(canvas, size);
   }
+
   void _renderWaves(Canvas canvas, Size size) {
-    final histogramLow = _createHistogram(fft, 15, 2, ((fft.length) / 4).floor());
-    final histogramHigh = _createHistogram(fft, 15, (fft.length / 4).ceil(), (fft.length / 2).floor());
+    final histogramLow =
+        _createHistogram(fft, 15, 2, ((fft.length) / 4).floor());
+    final histogramHigh = _createHistogram(
+        fft, 15, (fft.length / 4).ceil(), (fft.length / 2).floor());
 
     _renderHistogram(canvas, size, histogramLow);
     _renderHistogram(canvas, size, histogramHigh);
@@ -297,11 +309,8 @@ class VisualizerPainter extends CustomPainter {
     path.moveTo(0.0, size.height);
     path.lineTo(points[0], points[1]);
     for (int i = 2; i < points.length - 4; i += 2) {
-      path.cubicTo(
-          points[i - 2] + 10.0, points[i - 1],
-          points[i] - 10.0, points [i + 1],
-          points[i], points[i + 1]
-      );
+      path.cubicTo(points[i - 2] + 10.0, points[i - 1], points[i] - 10.0,
+          points[i + 1], points[i], points[i + 1]);
     }
     path.lineTo(size.width, size.height);
     path.close();
@@ -309,7 +318,8 @@ class VisualizerPainter extends CustomPainter {
     canvas.drawPath(path, wavePaint);
   }
 
-  List<int> _createHistogram(List<int> samples, int bucketCount, [int start, int end]) {
+  List<int> _createHistogram(List<int> samples, int bucketCount,
+      [int start, int end]) {
     if (start == end) {
       return const [];
     }
@@ -349,5 +359,4 @@ class VisualizerPainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
   }
-
 }
